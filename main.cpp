@@ -211,7 +211,8 @@ void intersects_ball_paddle(int ball, int paddle) {
 
         if (y.is_clamping) {
             r.velocity[ball].y *= -1.f;
-            return;
+			r.flags[ball].flag |= Flags::Collided;
+		   return;
         }
 
         float distance_to_mid = (r.position[ball].y - r.position[paddle].y) * (1.f / (r.bounds[paddle].height / 2.f));
