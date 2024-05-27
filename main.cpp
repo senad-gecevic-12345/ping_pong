@@ -214,7 +214,9 @@ void intersects_ball_paddle(int ball, int paddle) {
         r.position[ball] = plus(r.position[ball], mul(norm(diff), move));
 
         if (y.is_clamping) {
-            r.velocity[ball].y *= -1.f;
+            // can intersect several times on near 0 y and then looks wrong so need this
+			auto new_y =  r.position[ball].y > r.position[paddle].y ?  1.f : -1.f;
+            r.velocity[ball].y = fabsf(r.velocity[ball].y) * new_y;
 			r.flags[ball].flag |= Flags::Collided;
 		   return;
         }
@@ -444,6 +446,7 @@ void initialize() {
     initialize_bounds();
     initialize_values();
 }
+
 
 void update_right_paddle() {
     auto bp = r.position[EBall::B];
