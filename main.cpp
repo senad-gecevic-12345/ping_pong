@@ -11,9 +11,13 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 
+
 namespace{
     constexpr float g_coordinates_width { 800 };
     constexpr float g_coordinates_height{ 600 };
+	float g_width{g_coordinates_width};
+	float g_height{g_coordinates_height};
+
     constexpr float g_paddle_width{ 30 };
     constexpr float g_paddle_height{ 150 };
     constexpr float g_ball_diameter{ 25 };
@@ -323,7 +327,7 @@ public:
     }
     void use() {
         ShaderProgram::use();
-        glUniform2f(resolution_loc, g_coordinates_width, g_coordinates_height);
+        glUniform2f(resolution_loc, g_width, g_height);
     }
 };
 
@@ -340,7 +344,7 @@ public:
     }
     void use() {
         ShaderProgram::use();
-        glUniform2f(resolution_loc, g_coordinates_width, g_coordinates_height);
+        glUniform2f(resolution_loc, g_width, g_height);
     }
 };
 
@@ -372,7 +376,7 @@ public:
     void use(float time) {
         ShaderProgram::use();
         glUniform1f(time_loc, time);
-        glUniform2f(resolution_loc, g_coordinates_width, g_coordinates_height);
+        glUniform2f(resolution_loc, g_width, g_height);
     }
 };
 
@@ -479,6 +483,13 @@ void update_right_paddle() {
     
 }
 
+// basis res hardcoded to shaders for accurate scaling
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    g_width = width;
+    g_height = height;
+    glViewport(0, 0, width, height);
+}
 
 int main(){
 
@@ -496,7 +507,9 @@ int main(){
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+	glfwSetWindowAspectRatio(window, 4, 3);
 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
