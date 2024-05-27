@@ -166,8 +166,7 @@ ClampVal clamp(float val, float min, float max){
     return ClampVal{val, false};
 }
 
-bool float_is(float v, float comp) {
-    float epsilon = 0.001;
+bool float_is(float v, float comp, float epsilon = 0.001) {
     return (v + epsilon > comp && v - epsilon < comp);
 }
 
@@ -445,23 +444,26 @@ void update_right_paddle() {
     auto bp = r.position[EBall::B];
     auto rp = r.position[EPaddle::R];
     auto diff = minus(rp, bp);
-    if (vec2_is(diff, { 0, 0 })) return;
 
-	if (bp.x > rp.x && fabs(bp.y - rp.y) < r.bounds[EPaddle::R].height / 2) {
+    if (vec2_is(diff, { 0, 0 })) return;
+	if ((bp.x > rp.x && fabsf(bp.y - rp.y) < r.bounds[EPaddle::R].height / 2)) {
 		if(rp.y > 0)
 			r.velocity[EPaddle::R].y = -g_paddle_speed;
 		else
 			r.velocity[EPaddle::R].y = g_paddle_speed;
 		return;
 	}
-
     if (r.velocity[EBall::B].x < 0) {
         r.velocity[EPaddle::R] = { 0, 0 };
         return;
     }
-
-    if (float_is(r.velocity[EBall::B].x, 0))
-        return;
+	if (float_is(r.velocity[EBall::B].x, 0, 0.1)) {
+		if(bp.y > 0)
+			r.velocity[EPaddle::R].y = -g_paddle_speed;
+		else
+			r.velocity[EPaddle::R].y = g_paddle_speed;
+		return;
+	}
 
     auto yg = y_growth(r.velocity[EBall::B]);
     auto bs = len({ diff.x, yg * diff.x }) / g_ball_speed;
