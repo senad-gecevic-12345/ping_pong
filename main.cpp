@@ -20,7 +20,7 @@ namespace{
     constexpr float g_ball_speed{ 21.5 };
     constexpr float g_paddle_speed{ 7 };
 
-    const std::string g_shader_folder{"C:\\Users\\meme_\\Desktop\\pingpong\\"};
+    const std::string g_shader_folder{"C:\\Users\\meme_\\Desktop\\ping_pong\\"};
 }
 
 namespace Shapes {
@@ -228,7 +228,7 @@ void intersects_ball_paddle(int ball, int paddle) {
 void intersects_screen_check_handler(int id, float width, float height, bool flip = false){
     width /= 2.f;
     height /= 2.f;
-    if(std::abs(r.position[id].y) + height > g_coordinates_height/2.f){
+    if(fabsf(r.position[id].y) + height > g_coordinates_height/2.f){
         if (r.position[id].y > 0)
             r.position[id].y = g_coordinates_height/2.f - height;
         else
@@ -237,7 +237,7 @@ void intersects_screen_check_handler(int id, float width, float height, bool fli
             r.velocity[id].y *= -1;
         r.flags[id].flag |= Flags::Collided;
     }
-    if(std::abs(r.position[id].x) + width > g_coordinates_width/2.f){
+    if(fabsf(r.position[id].x) + width > g_coordinates_width/2.f){
         if (r.position[id].x > 0)
             r.position[id].x = g_coordinates_width/2.f - width;
         else
@@ -446,13 +446,15 @@ void update_right_paddle() {
     auto rp = r.position[EPaddle::R];
     auto diff = minus(rp, bp);
     if (vec2_is(diff, { 0, 0 })) return;
-	if (bp.x > rp.x) {
+
+	if (bp.x > rp.x && fabs(bp.y - rp.y) < r.bounds[EPaddle::R].height / 2) {
 		if(rp.y > 0)
 			r.velocity[EPaddle::R].y = -g_paddle_speed;
 		else
 			r.velocity[EPaddle::R].y = g_paddle_speed;
 		return;
 	}
+
     if (r.velocity[EBall::B].x < 0) {
         r.velocity[EPaddle::R] = { 0, 0 };
         return;
@@ -464,7 +466,7 @@ void update_right_paddle() {
     auto yg = y_growth(r.velocity[EBall::B]);
     auto bs = len({ diff.x, yg * diff.x }) / g_ball_speed;
     auto y = (yg * diff.x) + bp.y;
-    auto ps = std::abs(y - rp.y) / g_paddle_speed;
+    auto ps = fabsf(y - rp.y) / g_paddle_speed;
     auto d = clamp(ps / bs, 0, 1);
 
     if (y > rp.y) 
