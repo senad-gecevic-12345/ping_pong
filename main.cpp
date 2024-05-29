@@ -466,10 +466,10 @@ void update_right_paddle() {
         return;
     }
 	if (float_is(r.velocity[EBall::B].x, 0, 0.1)) {
-		if(bp.y > 0)
-			r.velocity[EPaddle::R].y = -g_paddle_speed;
-		else
+		if(r.velocity[EBall::B] > 0)
 			r.velocity[EPaddle::R].y = g_paddle_speed;
+		else
+			r.velocity[EPaddle::R].y = -g_paddle_speed;
 		return;
 	}
 
